@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { generateString } from '../helper/stringHelper';
 import Url from '../models/Url';
 import moment from 'moment';
+import path from 'path';
 
 require('dotenv').config();
 export default class ShortenerController {
@@ -10,7 +11,7 @@ export default class ShortenerController {
     try{   
       const longUrl = req.body.longUrl;
       const shortUrl = await generateString(8);
-      const expDate = moment().subtract(3, 'hours');
+      const expDate = moment().subtract(3, 'hours').add(15, 'days');
 
       let getUser: Url = await Url.create({
         shortened_uri: shortUrl,
@@ -34,7 +35,11 @@ export default class ShortenerController {
         }
       });
 
-      if(fullUrl) res.writeHead(301, { Location: fullUrl.original_url }).end();
+      const today = moment().subtract(3, 'hours');
+
+      if(fullUrl && today.isBefore(fullUrl.expiration_date)) return res.writeHead(301, { Location: fullUrl.original_url }).end();
+
+      return res.sendFile(path.join(__dirname, '../WEB-INF/pages/404.html'));
 
     } catch (error: any) {
       return res.status(500).json({message: 'Ocorreu um problema: ' + error.message});
