@@ -5,6 +5,6 @@ import authMiddleware from "../middlewares/authMiddleware";
 const router = Router();
 
 router.post('/shorten', authMiddleware, ShortenerController.shortenUrl);
-router.get('/pop/:shortUrl', authMiddleware, ShortenerController.popUrl);
+router.get('/pop/:shortUrl', ShortenerController.popUrl);
 
 export default router;

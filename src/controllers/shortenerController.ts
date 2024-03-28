@@ -3,6 +3,7 @@ import { generateString } from '../helper/stringHelper';
 import Url from '../models/Url';
 import moment from 'moment';
 
+require('dotenv').config();
 export default class ShortenerController {
 
   static async shortenUrl(req: Request, res: Response, next: NextFunction) {
@@ -17,7 +18,7 @@ export default class ShortenerController {
         expiration_date: expDate
       });
 
-      if(getUser) return res.status(201).json({ shortUrl: shortUrl });
+      if(getUser) return res.status(201).json({ shortUrl: process.env.DOMAIN+shortUrl });
       } catch (error: any) {
         return res.status(500).json({message: error.message});
       }
@@ -25,10 +26,15 @@ export default class ShortenerController {
 
   static async popUrl(req: Request, res: Response, next: NextFunction) {
     try{
+      const shortUrl = req.params.shortUrl;
 
-      
+      const fullUrl: any = await Url.findOne({
+        where: {
+            shortened_uri: `${shortUrl}`
+        }
+      });
 
-      next();
+      if(fullUrl) res.writeHead(301, { Location: fullUrl.original_url }).end();
 
     } catch (error: any) {
       return res.status(500).json({message: 'Ocorreu um problema: ' + error.message});
