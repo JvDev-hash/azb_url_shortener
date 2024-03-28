@@ -14,10 +14,9 @@ export default async function authMiddleware(req: Request, res: Response, next: 
             }
         })
 
+        if(!getUser || !bcrypt.compareSync(token, getUser.hashKey)) return res.status(401).json({ auth: false, message: 'Token provided not authorized' }); 
 
-        //if(!bcrypt.compareSync(token, process.env.APIKEY)) return res.status(401).json({ auth: false, message: 'Token provided not authorized' }); 
-
-        return res.status(200).json(getUser);
+        next();
     } catch(error: any){
         return res.status(500).json(error.message);
     }
