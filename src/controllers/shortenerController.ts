@@ -39,7 +39,7 @@ export default class ShortenerController {
 
       if(fullUrl && today.isBefore(fullUrl.expiration_date)) return res.writeHead(301, { Location: fullUrl.original_url }).end();
 
-      return res.sendFile(path.join(__dirname, '../WEB-INF/pages/404.html'));
+      return res.sendStatus(404);
 
     } catch (error: any) {
       return res.status(500).json({message: 'Ocorreu um problema: ' + error.message});
